@@ -6,7 +6,7 @@ O programa deve conter um menu inicial com 5 opções:
 
 i) incluir um novo contato; - *Willian* <br/>
 ii) excluir um contato existente; - *Rodrigo* <br/>
-iii) alterar um contato existente; <br/>
+iii) alterar um contato existente; - *Guilherme* <br/>
 iv) listar todos os contatos cadastrados; <br/>
 v) localizar um contato. <br/>
 
