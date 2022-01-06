@@ -30,7 +30,7 @@ void menuPrincipal(int itemMenu){
     printf("/ /_/ / /_/ /  __/ / / / /_/ / /_/ /  \n");
     printf("\\__,_/\\__, /\\___/_/ /_/\\__,_/\\__,_/   \n");
     printf("     /____/                           \n");
-    printf("\nInforme a operaÁ„o desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
+    printf("\nInforme a opera√ß√£o desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
     scanf("%d",&itemMenu);
     
     
@@ -39,7 +39,7 @@ void menuPrincipal(int itemMenu){
             incluir_dados();     
         } break;
         case 2: {
-               excluir_contato();
+            excluir_contato();
         } break;    
         case 3: {
                    
@@ -67,13 +67,13 @@ void incluir_dados(void){
     } else {
         printf("Arquivo aberto.\n");
 
-        registro.cod = contar_linhas(); //FunÁ„o que transforma o numero da linha no codigo identificador 
+        registro.cod = contar_linhas(); //Fun√ß√£o que transforma o numero da linha no codigo identificador 
 
         printf ("Digite o nome: ");
         limpar_buffer();
         scanf("%[^\n]%*c", registro.nome);
         
-        validar_email(); //FunÁ„o que pergunta e valida o email
+        validar_email(); //Fun√ß√£o que pergunta e valida o email
         
         printf ("Digite o numero de celular: ");
         scanf("%[^\n]%*c", registro.celular);
@@ -119,9 +119,9 @@ void excluir_contato(void){
 	remove("arquivo_agenda.txt");
 	rename("temp_agenda.txt", "arquivo_agenda.txt");
 	if (aux_excluido==1){
-		printf("Contato ExcluÌdo!");	
+		printf("Contato Exclu√≠do!");	
 	}else{
-		printf("Erro ao excluir: contato n„o encontrado!\n");
+		printf("Erro ao excluir: contato n√£o encontrado!\n");
 	}
     printf("\nPressione qualquer tecla para finalizar.\n");
     getchar();
