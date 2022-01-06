@@ -1,20 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <string.h>
 
 FILE *dados_agenda;
 int itemMenu;
 
-void incluir_dados();
+void incluir_dados(void);
+int contar_linhas(void);
+void limpar_buffer(void);
+char* validar_email(void);
+
 
 typedef struct{
  	int   cod;
-	char  nome[20];
+	char  nome[50];
 	char  email[100];
 	char  celular[14];
 } contato;
-
-
+contato registro;
 
 void menuPrincipal(int itemMenu){
 
@@ -24,14 +28,13 @@ void menuPrincipal(int itemMenu){
     printf("/ /_/ / /_/ /  __/ / / / /_/ / /_/ /  \n");
     printf("\\__,_/\\__, /\\___/_/ /_/\\__,_/\\__,_/   \n");
     printf("     /____/                           \n");
-    printf("\nInforme a operação desejada: \n1) incluir um novo contato; \n2) excluir um contato existente; \n3) alterar um contato existente; \n4) listar todos os contatos cadastrados; \n5) localizar um contato.\n");
+    printf("\nInforme a operação desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
     scanf("%d",&itemMenu);
     
     
 	switch (itemMenu){
 		case 1: {   
-            incluir_dados();
-              
+            incluir_dados();     
         } break;
         case 2: {
                
@@ -53,16 +56,67 @@ void menuPrincipal(int itemMenu){
 }
 
 
-void incluir_dados(){
-    dados_agenda = fopen("arquivo_agenda.txt", "w");
+void incluir_dados(void){
+    dados_agenda = fopen("arquivo_agenda.txt", "a+");
 
     if (dados_agenda == NULL) {
         printf("Erro na abertura do arquivo.\n");
+        
     } else {
         printf("Arquivo aberto.\n");
+
+        registro.cod = contar_linhas(); //Função que transforma o numero da linha no codigo identificador 
+
+        printf ("Digite o nome: ");
+        limpar_buffer();
+        scanf("%[^\n]%*c", registro.nome);
         
+        validar_email(); //Função que pergunta e valida o email
+        
+        printf ("Digite o numero de celular: ");
+        scanf("%[^\n]%*c", registro.celular);
+
+        fprintf(dados_agenda, "%d, %s, %s, %s\n", registro.cod, registro.nome, registro.email, registro.celular); //Essa parte registra no arquivo
     }
     fclose(dados_agenda);
+
+    printf("Contato Salvo!");
+    printf("\nPressione qualquer tecla para finalizar.");
+    getchar();
+}
+
+int contar_linhas(void) {
+    char conteudo; 
+    char letra = '\n';
+    int contador = 1;
+
+        while(fread (&conteudo, sizeof(char), 1, dados_agenda)) {
+            if(conteudo == letra) {
+                contador++;
+            }
+        } 
+    return contador;
+}
+
+void limpar_buffer(void) {
+    char c;
+    while((c = getchar()) != '\n' && c != EOF);
+}
+
+char* validar_email(void){
+    printf("Digite um email: ");
+    scanf("%[^\n]%*c", registro.email);
+
+    int tamanho=strlen(registro.email);
+
+    for(int i = 0; i < tamanho; i++){
+        char caracter = registro.email[i];
+        if(caracter == '@'){
+            return registro.email;
+        }      
+    }
+    printf("Email invalido!\n");
+    validar_email();
 }
 
 int main() {
