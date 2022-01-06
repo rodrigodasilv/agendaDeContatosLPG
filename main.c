@@ -4,12 +4,14 @@
 #include <string.h>
 
 FILE *dados_agenda;
+FILE *temp_agenda;
 int itemMenu;
 
 void incluir_dados(void);
 int contar_linhas(void);
 void limpar_buffer(void);
 char* validar_email(void);
+void excluir_contato(void);
 
 
 typedef struct{
@@ -28,7 +30,7 @@ void menuPrincipal(int itemMenu){
     printf("/ /_/ / /_/ /  __/ / / / /_/ / /_/ /  \n");
     printf("\\__,_/\\__, /\\___/_/ /_/\\__,_/\\__,_/   \n");
     printf("     /____/                           \n");
-    printf("\nInforme a operaÃ§Ã£o desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
+    printf("\nInforme a operação desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
     scanf("%d",&itemMenu);
     
     
@@ -37,7 +39,7 @@ void menuPrincipal(int itemMenu){
             incluir_dados();     
         } break;
         case 2: {
-               
+               excluir_contato();
         } break;    
         case 3: {
                    
@@ -65,13 +67,13 @@ void incluir_dados(void){
     } else {
         printf("Arquivo aberto.\n");
 
-        registro.cod = contar_linhas(); //FunÃ§Ã£o que transforma o numero da linha no codigo identificador 
+        registro.cod = contar_linhas(); //Função que transforma o numero da linha no codigo identificador 
 
         printf ("Digite o nome: ");
         limpar_buffer();
         scanf("%[^\n]%*c", registro.nome);
         
-        validar_email(); //FunÃ§Ã£o que pergunta e valida o email
+        validar_email(); //Função que pergunta e valida o email
         
         printf ("Digite o numero de celular: ");
         scanf("%[^\n]%*c", registro.celular);
@@ -82,6 +84,46 @@ void incluir_dados(void){
 
     printf("Contato Salvo!");
     printf("\nPressione qualquer tecla para finalizar.");
+    getchar();
+}
+
+void excluir_contato(void){
+	int id_contato; 
+	char conteudo[1001]; 
+	int linha = 1;
+	int aux_excluido=0;
+	printf("Informe o ID do contato para deletar: \n");
+	scanf("%d",&id_contato);
+	limpar_buffer();
+	
+	dados_agenda = fopen("arquivo_agenda.txt","r+");
+	temp_agenda  = fopen("temp_agenda.txt","w+");
+	
+	if (dados_agenda == NULL) {
+        printf("Erro na abertura do arquivo.\n");
+    } else {
+        printf("Arquivo aberto.\n");
+		while(fgets (conteudo, 1001, dados_agenda)) {
+            if(linha != id_contato){ 
+        		fputs(conteudo,temp_agenda);
+    		}else{
+    			fputs("\n",temp_agenda);
+    			aux_excluido=1;
+			}
+    		linha++;
+        } 
+    		
+	}
+	fclose(dados_agenda);
+	fclose(temp_agenda);
+	remove("arquivo_agenda.txt");
+	rename("temp_agenda.txt", "arquivo_agenda.txt");
+	if (aux_excluido==1){
+		printf("Contato Excluído!");	
+	}else{
+		printf("Erro ao excluir: contato não encontrado!\n");
+	}
+    printf("\nPressione qualquer tecla para finalizar.\n");
     getchar();
 }
 
