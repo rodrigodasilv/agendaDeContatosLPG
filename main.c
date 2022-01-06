@@ -4,12 +4,14 @@
 #include <string.h>
 
 FILE *dados_agenda;
+FILE *temp_agenda;
 int itemMenu;
 
 void incluir_dados(void);
 int contar_linhas(void);
 void limpar_buffer(void);
 char* validar_email(void);
+void excluir_contato(void);
 
 
 typedef struct{
@@ -37,7 +39,7 @@ void menuPrincipal(int itemMenu){
             incluir_dados();     
         } break;
         case 2: {
-               
+            excluir_contato();
         } break;    
         case 3: {
                    
@@ -82,6 +84,46 @@ void incluir_dados(void){
 
     printf("Contato Salvo!");
     printf("\nPressione qualquer tecla para finalizar.");
+    getchar();
+}
+
+void excluir_contato(void){
+	int id_contato; 
+	char conteudo[1001]; 
+	int linha = 1;
+	int aux_excluido=0;
+	printf("Informe o ID do contato para deletar: \n");
+	scanf("%d",&id_contato);
+	limpar_buffer();
+	
+	dados_agenda = fopen("arquivo_agenda.txt","r+");
+	temp_agenda  = fopen("temp_agenda.txt","w+");
+	
+	if (dados_agenda == NULL) {
+        printf("Erro na abertura do arquivo.\n");
+    } else {
+        printf("Arquivo aberto.\n");
+		while(fgets (conteudo, 1001, dados_agenda)) {
+            if(linha != id_contato){ 
+        		fputs(conteudo,temp_agenda);
+    		}else{
+    			fputs("\n",temp_agenda);
+    			aux_excluido=1;
+			}
+    		linha++;
+        } 
+    		
+	}
+	fclose(dados_agenda);
+	fclose(temp_agenda);
+	remove("arquivo_agenda.txt");
+	rename("temp_agenda.txt", "arquivo_agenda.txt");
+	if (aux_excluido==1){
+		printf("Contato Excluído!");	
+	}else{
+		printf("Erro ao excluir: contato não encontrado!\n");
+	}
+    printf("\nPressione qualquer tecla para finalizar.\n");
     getchar();
 }
 
