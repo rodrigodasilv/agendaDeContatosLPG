@@ -12,6 +12,7 @@ int contar_linhas(void);
 void limpar_buffer(void);
 char* validar_email(void);
 void excluir_contato(void);
+void listar_contatos(void);
 
 
 typedef struct{
@@ -39,13 +40,13 @@ void menuPrincipal(int itemMenu){
             incluir_dados();     
         } break;
         case 2: {
-               excluir_contato();
+            excluir_contato();
         } break;    
         case 3: {
                    
         } break;
         case 4: {
-                 
+            listar_contatos();   
         } break;
         case 5: {
                
@@ -67,13 +68,13 @@ void incluir_dados(void){
     } else {
         printf("Arquivo aberto.\n");
 
-        registro.cod = contar_linhas(); //Função que transforma o numero da linha no codigo identificador 
+        registro.cod = contar_linhas(); 
 
         printf ("Digite o nome: ");
         limpar_buffer();
         scanf("%[^\n]%*c", registro.nome);
         
-        validar_email(); //Função que pergunta e valida o email
+        validar_email();
         
         printf ("Digite o numero de celular: ");
         scanf("%[^\n]%*c", registro.celular);
@@ -89,7 +90,7 @@ void incluir_dados(void){
 
 void excluir_contato(void){
 	int id_contato; 
-	char conteudo[200]; 
+	char conteudo[168]; 
 	int linha = 1;
 	int aux_excluido=0;
 	printf("Informe o ID do contato para deletar: \n");
@@ -103,7 +104,7 @@ void excluir_contato(void){
         printf("Erro na abertura do arquivo.\n");
     } else {
         printf("Arquivo aberto.\n");
-		while(fgets (conteudo, 200, dados_agenda)) {
+		while(fgets (conteudo, sizeof(conteudo), dados_agenda)) {
             if(linha != id_contato){ 
         		fputs(conteudo,temp_agenda);
     		}else{
@@ -132,7 +133,7 @@ int contar_linhas(void) {
     char letra = '\n';
     int contador = 1;
 
-        while(fread (&conteudo, sizeof(char), 1, dados_agenda)) {
+    while(fread (&conteudo, sizeof(char), 1, dados_agenda)) {
             if(conteudo == letra) {
                 contador++;
             }
@@ -160,6 +161,43 @@ char* validar_email(void){
     printf("Email invalido!\n");
     validar_email();
 }
+
+
+void listar_contatos(void){
+    char *texto;
+    int retorno = 1;
+    
+    dados_agenda = fopen("arquivo_agenda.txt", "r");
+    if (dados_agenda == NULL) {
+        printf("Erro na abertura do arquivo.\n");  
+    } else {
+        printf("Arquivo aberto.\n");
+        char linha[168]; //168 porque e o numero de bytes no resgitro
+        
+        while(fgets(linha, sizeof(linha), dados_agenda) != NULL){
+            if(linha[0] == '\n'){
+                continue;
+            }
+            texto = strtok(linha,",");
+            printf("Codigo: %s -", texto);
+            texto = strtok(NULL,",");
+            printf(" Nome:%s -", texto);
+            texto = strtok(NULL,",");
+            printf(" Email:%s -", texto);
+            texto = strtok(NULL,",");
+            printf(" Celular:%s", texto);   
+        }    
+    }
+    retorno = fclose(dados_agenda);   
+    if(retorno == 0){
+        limpar_buffer();
+        printf("\nPressione qualquer tecla para finalizar.");
+        getchar();
+    }else {
+        printf("Erro ao fechar arquivo!");
+    }    
+}
+
 
 int main() {
 	setlocale(LC_ALL, "");
