@@ -31,7 +31,7 @@ void menuPrincipal(int itemMenu){
     printf("/ /_/ / /_/ /  __/ / / / /_/ / /_/ /  \n");
     printf("\\__,_/\\__, /\\___/_/ /_/\\__,_/\\__,_/   \n");
     printf("     /____/                           \n");
-    printf("\nInforme a opera√ß√£o desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
+    printf("\nInforme a operaÁ„o desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
     scanf("%d",&itemMenu);
     
     
@@ -90,7 +90,7 @@ void incluir_dados(void){
 
 void excluir_contato(void){
 	int id_contato; 
-	char conteudo[200]; 
+	char conteudo[168]; 
 	int linha = 1;
 	int aux_excluido=0;
 	printf("Informe o ID do contato para deletar: \n");
@@ -104,7 +104,7 @@ void excluir_contato(void){
         printf("Erro na abertura do arquivo.\n");
     } else {
         printf("Arquivo aberto.\n");
-		while(fgets (conteudo, 200, dados_agenda)) {
+		while(fgets (conteudo, sizeof(conteudo), dados_agenda)) {
             if(linha != id_contato){ 
         		fputs(conteudo,temp_agenda);
     		}else{
@@ -120,9 +120,9 @@ void excluir_contato(void){
 	remove("arquivo_agenda.txt");
 	rename("temp_agenda.txt", "arquivo_agenda.txt");
 	if (aux_excluido==1){
-		printf("Contato Exclu√≠do!");	
+		printf("Contato ExcluÌdo!");	
 	}else{
-		printf("Erro ao excluir: contato n√£o encontrado!\n");
+		printf("Erro ao excluir: contato n„o encontrado!\n");
 	}
     printf("\nPressione qualquer tecla para finalizar.\n");
     getchar();
