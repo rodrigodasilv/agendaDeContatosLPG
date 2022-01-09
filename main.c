@@ -13,6 +13,7 @@ void limpar_buffer(void);
 char* validar_email(void);
 void excluir_contato(void);
 void listar_contatos(void);
+int confere_excluido(int);
 
 
 typedef struct{
@@ -52,7 +53,7 @@ void menuPrincipal(int itemMenu){
                
         } break;
 		default: {
-            printf("Opcao Errada!\n");  
+            printf("A opção informada não existe!\n");  
         } break;
 	}
     menuPrincipal(itemMenu);
@@ -93,39 +94,75 @@ void excluir_contato(void){
 	char conteudo[168]; 
 	int linha = 1;
 	int aux_excluido=0;
-	printf("Informe o ID do contato para deletar: \n");
+    int retorno;
+	printf("Informe o código do contato para excluir: \n");
 	scanf("%d",&id_contato);
 	limpar_buffer();
+
+    retorno = confere_excluido(id_contato);
+    
+    if(retorno == 2){
+        printf("\nPressione qualquer tecla para finalizar.\n");
+        getchar();
+        return;
+    }
 	
-	dados_agenda = fopen("arquivo_agenda.txt","r+");
-	temp_agenda  = fopen("temp_agenda.txt","w+");
+    if(retorno == 0){
+        dados_agenda = fopen("arquivo_agenda.txt","r+");
+	    temp_agenda  = fopen("temp_agenda.txt","w+");
 	
-	if (dados_agenda == NULL) {
-        printf("Erro na abertura do arquivo.\n");
+        if (dados_agenda == NULL) {
+            printf("Erro na abertura do arquivo.\n");
+        } else {
+            printf("Arquivo aberto.\n");
+            while(fgets (conteudo, sizeof(conteudo), dados_agenda)) {
+                if(linha != id_contato){ 
+                    fputs(conteudo,temp_agenda);
+                }else{
+                fputs("\n",temp_agenda);
+                aux_excluido=1;
+                }
+                linha++;
+            }      
+        }
+        fclose(dados_agenda);
+        fclose(temp_agenda);
+        remove("arquivo_agenda.txt");
+        rename("temp_agenda.txt", "arquivo_agenda.txt");
+        if (aux_excluido==1){
+            printf("Contato Excluído!");	
+        }else{
+            printf("Erro ao excluir: contato não encontrado!\n");
+        }
     } else {
-        printf("Arquivo aberto.\n");
-		while(fgets (conteudo, sizeof(conteudo), dados_agenda)) {
-            if(linha != id_contato){ 
-        		fputs(conteudo,temp_agenda);
-    		}else{
-    			fputs("\n",temp_agenda);
-    			aux_excluido=1;
-			}
-    		linha++;
-        } 
-    		
-	}
-	fclose(dados_agenda);
-	fclose(temp_agenda);
-	remove("arquivo_agenda.txt");
-	rename("temp_agenda.txt", "arquivo_agenda.txt");
-	if (aux_excluido==1){
-		printf("Contato Excluído!");	
-	}else{
-		printf("Erro ao excluir: contato não encontrado!\n");
-	}
+        printf("Contato já excluído!\n");
+    } 
     printf("\nPressione qualquer tecla para finalizar.\n");
     getchar();
+}
+
+//A função confere_excluido auxilia a função excluir_contato,
+//se chamar um id para exclusão que já foi excluido ira retornar 1
+int confere_excluido(int id) {
+    char conteudo[168]; 
+	int linha = 1;
+    int teste_conteudo = 0;
+
+    dados_agenda = fopen("arquivo_agenda.txt", "r");
+    if (dados_agenda == NULL) {
+        printf("Erro na abertura do arquivo.\n"); 
+        teste_conteudo = 2;
+    } else {
+        while(fgets (conteudo, 168, dados_agenda) != NULL) {
+            if(conteudo[0] == '\n' && linha == id){
+                teste_conteudo = 1;
+                break; 
+            }
+            linha++;
+        }    
+    }
+    fclose(dados_agenda);
+    return teste_conteudo;  
 }
 
 int contar_linhas(void) {
@@ -158,7 +195,7 @@ char* validar_email(void){
             return registro.email;
         }      
     }
-    printf("Email invalido!\n");
+    printf("Email inválido!\n");
     validar_email();
 }
 
@@ -166,10 +203,11 @@ char* validar_email(void){
 void listar_contatos(void){
     char *texto;
     int retorno = 1;
+    int vazio = 0;
     
     dados_agenda = fopen("arquivo_agenda.txt", "r");
     if (dados_agenda == NULL) {
-        printf("Erro na abertura do arquivo.\n");  
+        printf("Erro na abertura do arquivo.\n");
     } else {
         printf("Arquivo aberto.\n");
         char linha[168]; //168 porque e o numero de bytes no resgitro
@@ -179,23 +217,24 @@ void listar_contatos(void){
                 continue;
             }
             texto = strtok(linha,",");
-            printf("Codigo: %s -", texto);
+            printf("Código: %s -", texto);
             texto = strtok(NULL,",");
             printf(" Nome:%s -", texto);
             texto = strtok(NULL,",");
             printf(" Email:%s -", texto);
             texto = strtok(NULL,",");
-            printf(" Celular:%s", texto);   
+            printf(" Celular:%s", texto);  
+
+            vazio = 1; 
         }    
     }
-    retorno = fclose(dados_agenda);   
-    if(retorno == 0){
-        limpar_buffer();
-        printf("\nPressione qualquer tecla para finalizar.");
-        getchar();
-    }else {
-        printf("Erro ao fechar arquivo!");
-    }    
+    retorno = fclose(dados_agenda); // Se o arquivo é fechado corretamente, então retorna 0
+    if(retorno == 0 && vazio == 0){ 
+        printf("Sem contatos armazenados!\n"); //<-- se arquivo existe e todos os contatos foram excluidos
+    }
+    limpar_buffer();
+    printf("\nPressione qualquer tecla para finalizar.");
+    getchar();   
 }
 
 
@@ -204,3 +243,4 @@ int main() {
 	menuPrincipal(0);
 	return 0;
 }
+
