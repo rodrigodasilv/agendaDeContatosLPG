@@ -32,7 +32,7 @@ void menuPrincipal(int itemMenu){
     printf("/ /_/ / /_/ /  __/ / / / /_/ / /_/ /  \n");
     printf("\\__,_/\\__, /\\___/_/ /_/\\__,_/\\__,_/   \n");
     printf("     /____/                           \n");
-    printf("\nInforme a opera√ß√£o desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
+    printf("\nInforme a operaÁ„o desejada: \n1) Incluir um novo contato; \n2) Excluir um contato existente; \n3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
     scanf("%d",&itemMenu);
     
     
@@ -53,7 +53,7 @@ void menuPrincipal(int itemMenu){
                
         } break;
 		default: {
-            printf("Opcao Errada!\n");  
+            printf("A opÁ„o informada n„o existe!\n");  
         } break;
 	}
     menuPrincipal(itemMenu);
@@ -95,7 +95,7 @@ void excluir_contato(void){
 	int linha = 1;
 	int aux_excluido=0;
     int retorno;
-	printf("Informe o ID do contato para deletar: \n");
+	printf("Informe o cÛdigo do contato para excluir: \n");
 	scanf("%d",&id_contato);
 	limpar_buffer();
 
@@ -130,19 +130,19 @@ void excluir_contato(void){
         remove("arquivo_agenda.txt");
         rename("temp_agenda.txt", "arquivo_agenda.txt");
         if (aux_excluido==1){
-            printf("Contato Exclu√≠do!");	
+            printf("Contato ExcluÌdo!");	
         }else{
-            printf("Erro ao excluir: contato n√£o encontrado!\n");
+            printf("Erro ao excluir: contato n„o encontrado!\n");
         }
     } else {
-        printf("Contato nao existe!\n");
+        printf("Contato j· excluÌdo!\n");
     } 
     printf("\nPressione qualquer tecla para finalizar.\n");
     getchar();
 }
 
-//A fun√ß√£o confere_excluido auxilia a fun√ß√£o excluir_contato,
-//se chamar um id para exclus√£o que j√° foi excluido ira retornar 1
+//A funÁ„o confere_excluido auxilia a funÁ„o excluir_contato,
+//se chamar um id para exclus„o que j· foi excluido ira retornar 1
 int confere_excluido(int id) {
     char conteudo[168]; 
 	int linha = 1;
@@ -195,7 +195,7 @@ char* validar_email(void){
             return registro.email;
         }      
     }
-    printf("Email invalido!\n");
+    printf("Email inv·lido!\n");
     validar_email();
 }
 
@@ -217,7 +217,7 @@ void listar_contatos(void){
                 continue;
             }
             texto = strtok(linha,",");
-            printf("Codigo: %s -", texto);
+            printf("CÛdigo: %s -", texto);
             texto = strtok(NULL,",");
             printf(" Nome:%s -", texto);
             texto = strtok(NULL,",");
@@ -228,9 +228,9 @@ void listar_contatos(void){
             vazio = 1; 
         }    
     }
-    retorno = fclose(dados_agenda); // Se o arquivo √© fechado corretamente, ent√£o retorna 0
+    retorno = fclose(dados_agenda); // Se o arquivo È fechado corretamente, ent„o retorna 0
     if(retorno == 0 && vazio == 0){ 
-        printf("Sem contatos Armazenados!\n"); //<-- se arquivo existe e todos os contatos foram excluidos
+        printf("Sem contatos armazenados!\n"); //<-- se arquivo existe e todos os contatos foram excluidos
     }
     limpar_buffer();
     printf("\nPressione qualquer tecla para finalizar.");
@@ -243,3 +243,4 @@ int main() {
 	menuPrincipal(0);
 	return 0;
 }
+
