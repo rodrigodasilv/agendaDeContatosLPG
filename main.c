@@ -53,7 +53,7 @@ void menuPrincipal(int itemMenu){
                
         } break;
 		default: {
-            printf("Opcao Errada!\n");  
+            printf("A opção informada não existe!\n");  
         } break;
 	}
     menuPrincipal(itemMenu);
@@ -73,12 +73,12 @@ void incluir_dados(void){
 
         printf ("Digite o nome: ");
         limpar_buffer();
-        scanf("%[^\n]%*c", registro.nome);
+        scanf(" %[^\n]%*c", registro.nome);
         
         validar_email();
         
         printf ("Digite o numero de celular: ");
-        scanf("%[^\n]%*c", registro.celular);
+        scanf(" %[^\n]%*c", registro.celular);
 
         fprintf(dados_agenda, "%d, %s, %s, %s\n", registro.cod, registro.nome, registro.email, registro.celular); //Essa parte registra no arquivo
     }
@@ -95,7 +95,7 @@ void excluir_contato(void){
 	int linha = 1;
 	int aux_excluido=0;
     int retorno;
-	printf("Informe o ID do contato para deletar: \n");
+	printf("Informe o código do contato para excluir: \n");
 	scanf("%d",&id_contato);
 	limpar_buffer();
 
@@ -135,7 +135,7 @@ void excluir_contato(void){
             printf("Erro ao excluir: contato não encontrado!\n");
         }
     } else {
-        printf("Contato nao existe!\n");
+        printf("Contato já excluído!\n");
     } 
     printf("\nPressione qualquer tecla para finalizar.\n");
     getchar();
@@ -185,7 +185,7 @@ void limpar_buffer(void) {
 
 char* validar_email(void){
     printf("Digite um email: ");
-    scanf("%[^\n]%*c", registro.email);
+    scanf(" %[^\n]%*c", registro.email);
 
     int tamanho=strlen(registro.email);
 
@@ -195,7 +195,7 @@ char* validar_email(void){
             return registro.email;
         }      
     }
-    printf("Email invalido!\n");
+    printf("Email inválido!\n");
     validar_email();
 }
 
@@ -217,7 +217,7 @@ void listar_contatos(void){
                 continue;
             }
             texto = strtok(linha,",");
-            printf("Codigo: %s -", texto);
+            printf("Código: %s -", texto);
             texto = strtok(NULL,",");
             printf(" Nome:%s -", texto);
             texto = strtok(NULL,",");
@@ -230,7 +230,7 @@ void listar_contatos(void){
     }
     retorno = fclose(dados_agenda); // Se o arquivo é fechado corretamente, então retorna 0
     if(retorno == 0 && vazio == 0){ 
-        printf("Sem contatos Armazenados!\n"); //<-- se arquivo existe e todos os contatos foram excluidos
+        printf("Sem contatos armazenados!\n"); //<-- se arquivo existe e todos os contatos foram excluidos
     }
     limpar_buffer();
     printf("\nPressione qualquer tecla para finalizar.");
