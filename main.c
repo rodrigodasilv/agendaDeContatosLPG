@@ -308,7 +308,7 @@ int min(int a, int b, int c) {
 
 // Faz o print formatado e ordenado do resultado da busca.
 void printa_na_tela(int distancia, char busca[]){
-	char *nomePont, *codigo, *texto;
+	char *nomePont, *texto;
 	int distanciaVerifica;
 	dados_agenda = fopen("arquivo_agenda.txt", "r");
     if (dados_agenda == NULL) {
@@ -322,7 +322,7 @@ void printa_na_tela(int distancia, char busca[]){
                 continue;
             }
            	strcpy(tempValores, valores); 	
-		    codigo = strtok(valores,","); 
+		    strtok(valores,","); 
 		    nomePont = strtok(NULL,",");
 		    char nomeStr[14] = "";
 		    strncpy(nomeStr, nomePont, 14);
