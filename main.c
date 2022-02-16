@@ -8,17 +8,18 @@ FILE *temp_agenda;
 int itemMenu;
 
 void clear(void);
+void pause(char *mensagem);
 char *myFgets(char mensagem[], int tamanho);
-char ** pedirDadosInclusao(void);
-void incluir_dados();
+char **pedirDadosInclusao(void);
+void incluir_dados(void);
 int contar_linhas(void);
 void limpar_buffer(void);
 int validar_email(char* email_input);
 void excluir_contato(void);
 void listar_contatos(void);
 int confere_excluido(int);
-int validar_edicao(void);
-void editar_contatos(int bool_validado);
+int pedir_idContato(void);
+void editar_contatos(void);
 void localizar_contatos(void);
 int editar_aux(int);
 int verificaDistancia(char[], int, char[], int);
@@ -34,6 +35,8 @@ typedef struct{
 Contato registro;
 
 void menuPrincipal(int itemMenu){
+    clear();
+
     printf("                              __      \n");   
     printf("  ____ _____ ____  ____  ____/ /___ _ \n"); 
     printf(" / __ `/ __ `/ _ \\/ __ \\/ __  / __ `/ \n");
@@ -44,7 +47,9 @@ void menuPrincipal(int itemMenu){
     printf("3) Alterar um contato existente; \n4) Listar todos os contatos cadastrados; \n5) Localizar um contato.\n");
     printf("6) Encerrar execucao.\n\nInput: ");
     scanf(" %d",&itemMenu);
+    limpar_buffer();
     
+    clear();
 	switch (itemMenu){
 		case 1: {   
             incluir_dados();     
@@ -53,7 +58,7 @@ void menuPrincipal(int itemMenu){
             excluir_contato();
         } break;    
         case 3: {
-            editar_contatos(validar_edicao());   
+            editar_contatos();   
         } break;
         case 4: {
             listar_contatos();   
@@ -62,21 +67,26 @@ void menuPrincipal(int itemMenu){
             localizar_contatos();  
         } break;
         case 6: {
-            return;
+            return; // Encerra o programa
         }
 		default: {
-            printf("Input invalido!\n");  
+            pause("Input invalido!\n");
+            clear();
         } break;
 	}
     menuPrincipal(itemMenu);
 }
 
-// Limpa o terminal
-void clear() {
-    system("cls");
+// Limpa o terminal.
+void clear() { system("cls"); }
+
+// Imprime uma mensagem personalizada e faz o programa ficar parado ate que seja pressionado ENTER.
+void pause(char *mensagem) {
+    printf("%sPressione ENTER para continuar.", mensagem);
+    getchar();
 }
 
-// Faz um fgets removendo a quebra de linha automática da função
+// Faz um fgets removendo a quebra de linha automática da função.
 char *myFgets(char mensagem[], int tamanho) {
     char *input = malloc(tamanho * sizeof(char));
     printf("%s", mensagem);
@@ -85,75 +95,78 @@ char *myFgets(char mensagem[], int tamanho) {
     return input;
 }
 
-// Faz o diálogo que pede para o usuário os dados a ser cadastrados
+/*
+Faz o diálogo que pede para o usuário os dados a ser cadastrados.
+Essa função é utilizada em incluir_dados e editar_contatos.
+*/
 char **pedirDadosInclusao(void) {
-    // Armazena os ponteiros das strings, serve para a função "retornar uma array"
+    // Armazena os ponteiros das strings, serve para que a função possa "retornar uma array"
     char **dadosInclusao = malloc(3 * sizeof(char *));
-    limpar_buffer();
     dadosInclusao[0] = myFgets("Digite o nome: ", 50);
-    do {dadosInclusao[1] = myFgets("Digite um email: ", 100);} while(validar_email(dadosInclusao[1]) != 1);
+    do{   dadosInclusao[1] = myFgets("Digite um email: ", 100);   }while(validar_email(dadosInclusao[1]) != 1);
     dadosInclusao[2] = myFgets("Digite o numero de celular: ", 14);
 
     return dadosInclusao;
 }
 
-// Recebe um array[3] de string e inclui esses dados no arquivo_agenda.txt
+// Inclui os dados coletados da função pedirDadosInclusao() no arquivo_agenda.txt
 void incluir_dados(){
     dados_agenda = fopen("arquivo_agenda.txt", "a+");
 
     if (dados_agenda == NULL) {
-        printf("Erro na abertura do arquivo.\n");
+        pause("Erro na abertura do arquivo.\n");
         return;
     } else {
-        printf("Arquivo aberto.\n");
+        printf("Arquivo aberto.\n\n");
 
         char **dados_incluir = pedirDadosInclusao();
         registro.cod = contar_linhas();
         strcpy(registro.nome, dados_incluir[0]);
         strcpy(registro.email, dados_incluir[1]);
         strcpy(registro.celular, dados_incluir[2]);
+        clear();
 
         fprintf(dados_agenda, "%d, %s, %s, %s\n", registro.cod, registro.nome, registro.email, registro.celular); //Essa parte registra no arquivo
+        printf("%d, %s, %s, %s\n\n", registro.cod, registro.nome, registro.email, registro.celular); //Essa parte faz o display
     }
     fclose(dados_agenda);
 
-    printf("Contato Salvo!");
-    printf("\nPressione qualquer tecla para finalizar.");
-    getchar();
+    pause("Contato Salvo!\n");
 }
 
+// Exclui o contato pelo id, se tal id existir.
 void excluir_contato(void){
 	int id_contato; 
 	char conteudo[168]; 
 	int linha = 1;
 	int aux_excluido=0;
     int retorno;
-	printf("Informe o codigo do contato para excluir: \n");
+	printf("Informe o codigo do contato para excluir: ");
 	scanf("%d",&id_contato);
 	limpar_buffer();
+    clear();
 
     retorno = confere_excluido(id_contato);
     
-    if(retorno == 2){
-        printf("\nPressione qualquer tecla para finalizar.\n");
-        getchar();
+    if(retorno == 2){ // A agenda nao abriu na funcao confere_excluido
+        pause("Erro na abertura do arquivo.\n");
         return;
-    }
-	
-    if(retorno == 0){
+    } else if (retorno == 1) { // O contato ja foi excluido (linha vazia)
+        pause("Contato ja excluido!\n");
+    } else if(retorno == 0){
         dados_agenda = fopen("arquivo_agenda.txt","r+");
 	    temp_agenda  = fopen("temp_agenda.txt","w+");
 	
         if (dados_agenda == NULL) {
-            printf("Erro na abertura do arquivo.\n");
+            pause("Erro na abertura do arquivo.\n");
         } else {
             printf("Arquivo aberto.\n");
             while(fgets (conteudo, sizeof(conteudo), dados_agenda)) {
                 if(linha != id_contato){ 
                     fputs(conteudo,temp_agenda);
                 }else{
-                fputs("\n",temp_agenda);
-                aux_excluido=1;
+                    fputs("\n",temp_agenda);
+                    aux_excluido=1;
                 }
                 linha++;
             }      
@@ -163,19 +176,19 @@ void excluir_contato(void){
         remove("arquivo_agenda.txt");
         rename("temp_agenda.txt", "arquivo_agenda.txt");
         if (aux_excluido==1){
-            printf("Contato Excluido!");	
+            pause("Contato Excluido!\n");	
         }else{
-            printf("Erro ao excluir: contato nao encontrado!\n");
+            pause("Erro ao excluir: contato nao encontrado!\n");
         }
-    } else {
-        printf("Contato ja excluido!\n");
-    } 
-    printf("\nPressione qualquer tecla para finalizar.\n");
-    getchar();
+    }
 }
 
-//A função confere_excluido auxilia a função excluir_contato,
-//se chamar um id para exclusão que já foi excluido ira retornar 1
+/*
+A função confere_excluido auxilia a função excluir_contato.
+Retorna 0 se chamar um id que não foi excluído.
+Retorna 1 se chamar um id que já foi excluído.
+Retorna 2 se deu erro na abertura da agenda.
+*/
 int confere_excluido(int id) {
     char conteudo[168]; 
 	int linha = 1;
@@ -183,7 +196,6 @@ int confere_excluido(int id) {
 
     dados_agenda = fopen("arquivo_agenda.txt", "r");
     if (dados_agenda == NULL) {
-        printf("Erro na abertura do arquivo.\n"); 
         teste_conteudo = 2;
     } else {
         while(fgets (conteudo, 168, dados_agenda) != NULL) {
@@ -198,6 +210,8 @@ int confere_excluido(int id) {
     return teste_conteudo;  
 }
 
+// Faz a contagem da quantidade de linhas.
+// É usada para definir o próximo id.
 int contar_linhas(void) {
     char conteudo; 
     char letra = '\n';
@@ -211,6 +225,7 @@ int contar_linhas(void) {
     return contador;
 }
 
+// Remove qualquer resquicio no buffer do teclado
 void limpar_buffer(void) {
     char c;
     while((c = getchar()) != '\n' && c != EOF);
@@ -226,10 +241,11 @@ int validar_email(char *email_input){
         if(caracter == '@')
             return 1;
     }
-    printf("Email invalido!\n");
+    printf("Email invalido!\n\n");
     return 0;
 }
 
+// Lista no terminal todos os contatos da agenda.
 void listar_contatos(void){
     char *texto;
     int retorno = 1;
@@ -237,9 +253,9 @@ void listar_contatos(void){
     
     dados_agenda = fopen("arquivo_agenda.txt", "r");
     if (dados_agenda == NULL) {
-        printf("Erro na abertura do arquivo.\n");
+        pause("Erro na abertura do arquivo.\n");
     } else {
-        printf("Arquivo aberto.\n");
+        printf("Arquivo aberto.\n\n");
         char linha[168]; //168 porque e o numero de bytes no resgitro
         
         while(fgets(linha, sizeof(linha), dados_agenda) != NULL){
@@ -258,40 +274,30 @@ void listar_contatos(void){
             vazio = 1; 
         }    
     }
-    retorno = fclose(dados_agenda); // Se o arquivo � fechado corretamente, ent�o retorna 0
+    retorno = fclose(dados_agenda); // Se o arquivo foi fechado corretamente, entao retorna 0
     if(retorno == 0 && vazio == 0){ 
-        printf("Sem contatos armazenados!\n"); //<-- se arquivo existe e todos os contatos foram excluidos
+        pause("Sem contatos armazenados!\n"); //<-- se o arquivo existe e todos os contatos foram excluidos
     }
-    limpar_buffer();
-    printf("\nPressione qualquer tecla para finalizar.");
-    getchar();   
+    pause("\n\n");
 }
 
-void localizar_contatos(void){
-	char busca[14];
-	printf("Digite o nome do contato :");
-	scanf("%s", busca);
-	for(int i = 0; i < 6; i++){
-		printa_na_tela(i, busca);
-	} 
-}
-
-int verificaDistancia(char nome[], int tamB,char busca[], int tamA){
-
-	if (tamA == 0) return tamB;
-	if (tamB == 0) return tamA;
+// Faz as substituições entre o nome atual do arquivo e o input de busca do usuário até que ambos sejam iguais,
+// em seguida, contabiliza quantas substituições foram necessárias para constatar a distância entre as palavras.
+int verificaDistancia(char nome[], int tamNome, char busca[], int tamBusca){
+	if (tamBusca == 0) return tamNome;
+	if (tamNome == 0) return tamBusca;
     
-    if (busca[tamA - 1] == nome[tamB - 1]) {
-        return verificaDistancia(busca, tamA - 1, nome, tamB - 1);
+    if (busca[tamBusca - 1] == nome[tamNome - 1]) {
+        return verificaDistancia(busca, tamBusca - 1, nome, tamNome - 1);
 	}
 
-    int s = verificaDistancia(busca, tamA - 1, nome, tamB - 1); 
-    int r = verificaDistancia(busca, tamA, nome, tamB - 1); 
-    int i = verificaDistancia(busca, tamA - 1, nome, tamB); 
+    int s = verificaDistancia(busca, tamBusca - 1, nome, tamNome - 1); 
+    int r = verificaDistancia(busca, tamBusca, nome, tamNome - 1); 
+    int i = verificaDistancia(busca, tamBusca - 1, nome, tamNome); 
     return min(s, r, i) + 1;
 }
 
-// Retorna o valor mínimo entre os termos
+// Retorna o valor mínimo entre os três termos.
 int min(int a, int b, int c) {
 	int min = a;
 	if (min > b) min = b;
@@ -300,12 +306,13 @@ int min(int a, int b, int c) {
 	return min;
 }
 
+// Faz o print formatado e ordenado do resultado da busca.
 void printa_na_tela(int distancia, char busca[]){
 	char *nomePont, *codigo, *texto;
 	int distanciaVerifica;
 	dados_agenda = fopen("arquivo_agenda.txt", "r");
     if (dados_agenda == NULL) {
-        printf("Erro na abertura do arquivo.\n");
+        pause("Erro na abertura do arquivo.\n");
     } else {
         char valores[168]; 
         char tempValores[168];
@@ -335,34 +342,52 @@ void printa_na_tela(int distancia, char busca[]){
 	}
 }
 
+// Faz a busca no arquivo de acordo com o nome inserido pelo usuario
+void localizar_contatos(void){
+	char busca[14];
+	printf("Digite o nome do contato: ");
+	scanf(" %s", busca);
+    limpar_buffer();
+    printf("\n");
+
+	for(int i = 0; i < 5; i++){
+		printa_na_tela(i, busca);
+	}
+    pause("\n\n");
+}
+
 // Faz a validacao do input do usuário.
-int validar_edicao() {
+// Retorna 0 se o usuário decidir voltar ao menu.
+// Retorna o próprio id do contato, se for validado.
+int pedir_idContato() {
     int id_contato;
     do {
         printf("Digite 0 para voltar ao menu.\nID do registro: ");
         scanf(" %i", &id_contato);
+        limpar_buffer();
         
         if (id_contato == 0)             // Voltar para o menu
             return 0;
         else if (editar_aux(id_contato)) // Opcao validada
-            return 1;
+            return id_contato;
         else {                           // Opcao invalida
             clear();
             printf("ID invalido.\n");
         }
     } while (id_contato != 0 || editar_aux(id_contato) != 1);
 }
-// Faz a edição de um contato já existente.
-void editar_contatos(int bool_validado) {
-    if (bool_validado == 0) return; // O usuario decidiu voltar ao menu
 
-    int id_contato;
+// Faz a edição de um contato já existente.
+void editar_contatos() {
+    int id_contato = pedir_idContato();
+    if (id_contato == 0) return; // O usuario decidiu voltar ao menu
+
     char dados[168];
 
     // Coleta os dados do arquivo
     dados_agenda = fopen("arquivo_agenda.txt", "r");
     if (dados_agenda == NULL) {
-        printf("Erro na abertura do arquivo.\n");
+        pause("Erro na abertura do arquivo.\n");
         return;
     }
 
@@ -401,7 +426,7 @@ void editar_contatos(int bool_validado) {
     fclose(temp_agenda);
     if (remove("arquivo_agenda.txt") != 0) perror("Erro");
     rename("temp_agenda.txt", "arquivo_agenda.txt");
-}    
+}  
 
 /*
 Auxilia a função editar contato. 
