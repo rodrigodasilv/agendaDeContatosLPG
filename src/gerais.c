@@ -23,7 +23,7 @@ void limpar_buffer(void) {
 
 int input_valido(char *input) {
     int tamanho=strlen(input);
-    char *caracteres_invalidos = ",.;-!#$\\%%¨&*()|*º°ª§_=+?/";
+    char *caracteres_invalidos = ",;-!#$\\%%¨&*()|*º°ª§_=+?/";
     int valido = 1;
     for(int i = 0; i < tamanho; i++){
         char caracter = input[i];
@@ -39,6 +39,7 @@ int input_valido(char *input) {
 // Faz um fgets removendo a quebra de linha automática da função.
 // Usado no pedirDadosInclusao() na parte de incluir contato.
 char *myFgets(char mensagem[], int tamanho) {
+    tamanho += 1; // compensando que em baixo vai ser removido um caractere ("\n").
     char *input = malloc(tamanho * sizeof(char));
     do {
         printf("%s", mensagem);
@@ -46,6 +47,7 @@ char *myFgets(char mensagem[], int tamanho) {
     } while (input_valido(input) == 0);
     if (strchr(input, '\n') == NULL) limpar_buffer(); // Remove tudo além do limite de input
     else input[strcspn(input, "\n")] = 0; // Remove a quebra de linha
+
     return input;
 }
 
@@ -67,13 +69,13 @@ int contar_linhas(char *dir, char *escolha) {
         while(fread (&conteudo, sizeof(char), 1, agenda))
             if (conteudo == '\n') contador++;
     } else if (strcmp(escolha, "vago") == 0) {
-        char dados[100];
+        char dados[101];
         while(fgets (dados, sizeof(dados), agenda) != NULL){
             if (dados[0] != '\n') contador++;
             else break;
         }
     } else if (strcmp(escolha, "sobrando") == 0) {
-        char dados[100];
+        char dados[101];
         while(fgets (dados, sizeof(dados), agenda) != NULL){
             if (dados[0] == '\n') contador++;
             else if (dados[0] != '\n') contador = 1;
@@ -130,7 +132,7 @@ int agenda_vazia(char *dir) {
 Contato str_to_contato(char *string) {
     Contato registro;
     char *token;
-
+    
     token = strtok(string, ",");
     registro.cod = atoi(token);
     token = strtok(NULL, ",");
@@ -145,7 +147,7 @@ Contato str_to_contato(char *string) {
 
 // Puxa os dados da agenda e guarda em uma array de strings.
 char **extrair_dados(char *dir_agenda) {
-    char dados[100]; // Tamanho da linha
+    char dados[101]; // Tamanho da linha (1 + 30 + 50 + 14 + 6)
     int linhas = contar_linhas(dir_agenda, "usadas");
     char **array_dados = malloc(linhas * sizeof(dados));
 
@@ -157,8 +159,9 @@ char **extrair_dados(char *dir_agenda) {
         size_t len = 0;
         char *line = NULL;
         while (getline(&line, &len, agenda)) {
+            line[strcspn(line, "\n")] = 0; // Remove a quebra de linha
             array_dados[i] = strdup(line);
-            i++;
+            i += 1;
             if (contar_linhas(dir_agenda, "usadas") == i) break;
         }
     } fclose(agenda);
@@ -179,12 +182,12 @@ void inserir_dados(char* dir_agenda, Contato registro, int operacao) {
         pause("Erro na abertura do arquivo.\n");
         return;
     }
-
+    
     int linhas_usadas = contar_linhas(dir_agenda, "usadas");
     // Cria uma agenda temporaria com o contato editado
     if(contar_linhas(dir_agenda, "full") <= 2) fputs("\n", agenda);
     int id_aux = 1;
-    char dados[100]; // Tamanho da linha
+    char dados[101]; // Tamanho da linha (1 + 30 + 50 + 14 + 6)
     while (fgets (dados, sizeof(dados), agenda) != NULL) {
         if(id_aux != registro.cod) fprintf(temp_agenda, "%s", dados);
         else if (id_aux == registro.cod) {
