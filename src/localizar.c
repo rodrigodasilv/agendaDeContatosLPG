@@ -49,35 +49,30 @@ int min(int a, int b, int c) {
 
 // Faz o print formatado e ordenado do resultado da busca.
 void printa_na_tela(int distancia, char busca[]){
-	char *nomePont, *texto;
+	char *nomeStr;
 	int distanciaVerifica;
 	FILE *agenda = fopen("arquivo_agenda.txt", "r");
     if (agenda == NULL) pause("Erro na abertura do arquivo.\n");
     else {
-        char valores[168]; 
+        int max = contar_linhas("arquivo_agenda.txt", "usadas");
+        char **conteudo = extrair_dados("arquivo_agenda.txt");
+        Contato registro;
+
         char tempValores[168];
-        
-        while(fgets(valores, sizeof(valores), agenda) != NULL){
-        	if(valores[0] == '\n'){
-                continue;
-            }
-           	strcpy(tempValores, valores); 	
-		    strtok(valores,","); 
-		    nomePont = strtok(NULL,",");
-		    char nomeStr[14] = "";
-		    strncpy(nomeStr, nomePont, 14);
+        for (int i = 0; i < max; i++){
+        	if(conteudo[i][0] == '\n') continue;
+
+           	strcpy(tempValores, conteudo[i]); 	
+		    strtok(conteudo[i],","); 
+		    nomeStr = strtok(NULL,",");
 		    distanciaVerifica = verificaDistancia(nomeStr,strlen(nomeStr), busca, strlen(busca));
 		    if(distanciaVerifica == distancia){
-			    texto = strtok(tempValores,",");
-		        printf("Codigo: %s -", texto);
-		        texto = strtok(NULL,",");
-		        printf(" Nome:%s -", texto);
-		        texto = strtok(NULL,",");
-		        printf(" Email:%s -", texto);
-		        texto = strtok(NULL,",");
-		        printf(" Celular:%s", texto); 
+				registro = str_to_contato(tempValores);
+		        printf("Codigo: %i -", registro.cod);
+                printf(" Nome:%s -", registro.nome);
+                printf(" Email:%s -", registro.email);
+                printf(" Celular:%s", registro.celular);
 			}
-        }    
-    fclose(agenda);
+        } fclose(agenda);
 	}
 }
