@@ -21,12 +21,29 @@ void limpar_buffer(void) {
     while((c = getchar()) != '\n' && c != EOF);
 }
 
+int input_valido(char *input) {
+    int tamanho=strlen(input);
+    char *caracteres_invalidos = ",.;-!#$\\%%¨&*()|*º°ª§_=+?/";
+    int valido = 1;
+    for(int i = 0; i < tamanho; i++){
+        char caracter = input[i];
+        for(int j = 0; j < strlen(caracteres_invalidos); j++) {
+            if(caracter == caracteres_invalidos[j]) {
+                valido = 0;
+                break;
+            }
+        }
+    } if (valido == 0) printf("Input invalido!\n\n");
+    return valido;
+}
 // Faz um fgets removendo a quebra de linha automática da função.
 // Usado no pedirDadosInclusao() na parte de incluir contato.
 char *myFgets(char mensagem[], int tamanho) {
     char *input = malloc(tamanho * sizeof(char));
-    printf("%s", mensagem);
-    fgets(input, tamanho, stdin);
+    do {
+        printf("%s", mensagem);
+        fgets(input, tamanho, stdin);  
+    } while (input_valido(input) == 0);
     if (strchr(input, '\n') == NULL) limpar_buffer(); // Remove tudo além do limite de input
     else input[strcspn(input, "\n")] = 0; // Remove a quebra de linha
     return input;
@@ -47,9 +64,8 @@ int contar_linhas(char *dir, char *escolha) {
 
     if (strcmp(escolha, "full") == 0) {
         char conteudo;
-        while(fread (&conteudo, sizeof(char), 1, agenda)){
+        while(fread (&conteudo, sizeof(char), 1, agenda))
             if (conteudo == '\n') contador++;
-        }
     } else if (strcmp(escolha, "vago") == 0) {
         char dados[100];
         while(fgets (dados, sizeof(dados), agenda) != NULL){
