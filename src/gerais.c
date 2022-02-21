@@ -27,7 +27,8 @@ char *myFgets(char mensagem[], int tamanho) {
     char *input = malloc(tamanho * sizeof(char));
     printf("%s", mensagem);
     fgets(input, tamanho, stdin);
-    input[strcspn(input, "\n")] = 0; // Remove a quebra de linha
+    if (strchr(input, '\n') == NULL) limpar_buffer(); // Remove tudo além do limite de input
+    else input[strcspn(input, "\n")] = 0; // Remove a quebra de linha
     return input;
 }
 
@@ -50,13 +51,13 @@ int contar_linhas(char *dir, char *escolha) {
             if (conteudo == '\n') contador++;
         }
     } else if (strcmp(escolha, "vago") == 0) {
-        char dados[168];
+        char dados[100];
         while(fgets (dados, sizeof(dados), agenda) != NULL){
             if (dados[0] != '\n') contador++;
             else break;
         }
     } else if (strcmp(escolha, "sobrando") == 0) {
-        char dados[168];
+        char dados[100];
         while(fgets (dados, sizeof(dados), agenda) != NULL){
             if (dados[0] == '\n') contador++;
             else if (dados[0] != '\n') contador = 1;
@@ -128,7 +129,7 @@ Contato str_to_contato(char *string) {
 
 // Puxa os dados da agenda e guarda em uma array de strings.
 char **extrair_dados(char *dir_agenda) {
-    char dados[168]; // Tamanho da linha
+    char dados[100]; // Tamanho da linha
     int linhas = contar_linhas(dir_agenda, "usadas");
     char **array_dados = malloc(linhas * sizeof(dados));
 
@@ -167,7 +168,7 @@ void inserir_dados(char* dir_agenda, Contato registro, int operacao) {
     // Cria uma agenda temporaria com o contato editado
     if(contar_linhas(dir_agenda, "full") <= 2) fputs("\n", agenda);
     int id_aux = 1;
-    char dados[168]; // Tamanho da linha
+    char dados[100]; // Tamanho da linha
     while (fgets (dados, sizeof(dados), agenda) != NULL) {
         if(id_aux != registro.cod) fprintf(temp_agenda, "%s", dados);
         else if (id_aux == registro.cod) {
