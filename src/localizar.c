@@ -58,7 +58,7 @@ void printa_na_tela(int distancia, char busca[]){
         char **conteudo = extrair_dados("arquivo_agenda.txt");
         Contato registro;
 
-        char tempValores[168];
+        char tempValores[101]; // Tamanho da linha (1 + 30 + 50 + 14 + 6)
         for (int i = 0; i < max; i++){
         	if(conteudo[i][0] == '\n') continue;
 
