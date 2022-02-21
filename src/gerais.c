@@ -135,15 +135,15 @@ char **extrair_dados(char *dir_agenda) {
     FILE *agenda = fopen(dir_agenda, "r");
     if (agenda == NULL) {
         pause("Erro na abertura do arquivo.\n");
-        return NULL;
-    }
-
-    int i = 0;
-    while (fgets(dados, sizeof(dados), agenda) != NULL) {
-        dados[strcspn(dados, "\n")] = 0; // Remove a quebra de linha
-        array_dados[i] = strdup(dados);
-        i++;
-        if (contar_linhas(dir_agenda, "usadas") == i) break;
+    } else {
+        int i = 0;
+        size_t len = 0;
+        char *line = NULL;
+        while (getline(&line, &len, agenda)) {
+            array_dados[i] = strdup(line);
+            i++;
+            if (contar_linhas(dir_agenda, "usadas") == i) break;
+        }
     } fclose(agenda);
 
     return array_dados;
