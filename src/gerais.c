@@ -159,7 +159,6 @@ char **extrair_dados(char *dir_agenda) {
         size_t len = 0;
         char *line = NULL;
         while (getline(&line, &len, agenda)) {
-            line[strcspn(line, "\n")] = 0; // Remove a quebra de linha
             array_dados[i] = strdup(line);
             i += 1;
             if (contar_linhas(dir_agenda, "usadas") == i) break;
