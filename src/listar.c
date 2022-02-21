@@ -17,11 +17,13 @@ void listar_contatos(void){
         char **conteudo = extrair_dados("arquivo_agenda.txt");
         Contato registro;
         for (int i = 0; i < max; i++) {
-            registro = str_to_contato(conteudo[i]);
-            printf("Codigo: %i -", registro.cod);
-            printf(" Nome:%s -", registro.nome);
-            printf(" Email:%s -", registro.email);
-            printf(" Celular:%s\n", registro.celular);
+            if(conteudo[i][0] != '\n'){
+                registro = str_to_contato(conteudo[i]);
+                printf("Codigo: %i -", registro.cod);
+                printf(" Nome:%s -", registro.nome);
+                printf(" Email:%s -", registro.email);
+                printf(" Celular:%s", registro.celular);
+            }
         }
     }
     pause("\n\n");
