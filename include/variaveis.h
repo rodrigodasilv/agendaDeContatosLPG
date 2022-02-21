@@ -9,6 +9,6 @@ typedef struct{
 	char  email[100];
 	char  celular[15];
 } Contato;
-Contato registro;
+extern Contato registro;
 
 #endif
