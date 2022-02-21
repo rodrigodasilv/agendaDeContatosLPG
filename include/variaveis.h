@@ -7,7 +7,7 @@ typedef struct{
  	int   cod;
 	char  nome[50];
 	char  email[100];
-	char  celular[14];
+	char  celular[15];
 } Contato;
 Contato registro;
 
