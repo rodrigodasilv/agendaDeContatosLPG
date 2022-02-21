@@ -27,11 +27,10 @@ void excluir_contato(void){
         inserir_dados("arquivo_agenda.txt", registro, 0); // O zero sinaliza a exclusao do id
 
         // Verifica se o contato foi realmente excluido (Redundancia)
-        if (agenda_vazia("arquivo_agenda.txt") == 0) {
+        if (agenda_vazia("arquivo_agenda.txt") == 1) {
             pause("A agenda agora esta vazia.\n");
         } else{
-            conteudo = extrair_dados("arquivo_agenda.txt")[id_contato-1];
-            if (*conteudo == 0) pause("Contato Excluido!\n");	
+            if (contato_existe(id_contato) == 0) pause("Contato Excluido!\n");	
             else pause("Erro ao excluir!\n");
         }
     }
