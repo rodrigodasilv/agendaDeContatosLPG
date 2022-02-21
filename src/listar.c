@@ -22,7 +22,7 @@ void listar_contatos(void){
                 printf("Codigo: %i -", registro.cod);
                 printf(" Nome:%s -", registro.nome);
                 printf(" Email:%s -", registro.email);
-                printf(" Celular:%s\n", registro.celular);
+                printf(" Celular:%s", registro.celular);
             }
         }
     }
