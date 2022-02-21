@@ -43,9 +43,9 @@ Essa função é utilizada em incluir_contato() e alterar_contato().
 char **pedirDadosInclusao(void) {
     // Armazena os ponteiros das strings, serve para que a função possa "retornar uma array"
     char **dadosInclusao = malloc(3 * sizeof(char *));
-    dadosInclusao[0] = myFgets("Digite o nome: ", 50);
+    dadosInclusao[0] = myFgets("Digite o nome: ", 30);
     do {
-        dadosInclusao[1] = myFgets("Digite um email: ", 100);
+        dadosInclusao[1] = myFgets("Digite um email: ", 50);
     } while(validar_email(dadosInclusao[1]) != 1);
     dadosInclusao[2] = myFgets("Digite o numero de celular: ", 14);
 
